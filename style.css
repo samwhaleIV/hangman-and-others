@@ -6,7 +6,7 @@ html, body {
 }
 body {
     background-color: white;
-    color: black;
+    color: #000;
 }
 .hidden {
     display: none !important;
@@ -300,6 +300,11 @@ button.exit-button {
     background-color: #ffffff;
     z-index: 1;
     color: black;
+    border-style: solid;
+    border-width: 2px;
+    border-left-width: 0;
+    border-top-width: 0;
+    border-color: inherit;
 }
 button.exit-button:hover {
     background-color: #d0d0d0;
@@ -319,16 +324,12 @@ div#word-banks h1 {
     user-select: none;
 }
 
-div.word-banks div {
-    background-color: #fff;
+div.word-banks div.word-bank {
     width: 100%;
     box-sizing: border-box;
     margin-bottom: 0;
     margin-bottom: 22px;
-}
-
-div.word-banks div:nth-child() {
-
+    color: white;
 }
 
 div.word-banks {
@@ -338,7 +339,7 @@ div.word-banks {
     max-width: 100%;
 }
 
-div.word-banks div p {
+div.word-bank p {
     font-family: sans-serif;
     font-size: 16px;
     margin: 0;
@@ -349,29 +350,149 @@ div.word-banks div p {
     padding-bottom: 10px;
 }
 
-div.word-banks div div.action-container {
+div.word-bank div.action-container {
     padding: 8px;
     padding-top: 0;
 }
 
-div.word-banks div div.action-container button {
+div.word-bank div.action-container button {
     width: 200px;
     height: 40px;
     padding: 0;
     display: block;
     width: 100%;
     margin-top: 8px;
+    border: 0;
+    background-color: #131313;
+    color: white;
+    font-weight: bold;
+    transition-duration: 0.2s;
+    transition-property: background-color;
+}
+div.word-bank div.action-container button:hover {
+    background-color: #00000091;
+}
+div.word-bank div.action-container button:focus,
+div.word-bank div.action-container button:active {
+    outline: none;
 }
 
-div#word-banks div.word-banks div h1 {
+div#word-banks div.word-banks div.word-bank h1 {
     margin: 0;
     font-size: 18px;
     padding: 16px;
-    background-color: rgb(178, 92, 92);
+    background-color: #3c3c3c57;
     color: white;
     text-align: left;
 }
 
 div#word-banks {
     padding-top: 65px;
+}
+.green {
+    background-color: #75b25c;
+}
+.purple {
+    background-color: #5c6fb2;
+}
+.blue {
+    background-color: #5cb2b2;
+}
+.orange {
+    background-color: #c59f31;
+}
+.red {
+    background-color: #b25c7c;
+}
+
+div.word-bank-modal {
+    position: relative;
+    box-sizing: border-box;
+    width: 500px;
+    height: 400px;
+    background-color: #fff;
+    transform: translate(-50%,-50%);
+    top: 50%;
+    left: 50%;
+    max-width: 100%;
+    max-height: 100%;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+div.words div.word {
+    display: flex;
+    padding: 0px 8px;
+}
+
+div.words div.word input, div.words div.word select {
+    width: 50%;
+    margin: 4px;
+    display: block;
+    border: 0;
+    background-color: #2d2d2d;
+    height: 47px;
+    color: white;
+    font-size: 14px;
+    box-sizing: border-box;
+    padding: 0px 8px;
+}
+div.words div.word input::placeholder {
+    color: #acacac;
+}
+div.word-bank-modal input.title {
+    font-family: sans-serif;
+    text-align: center;
+    padding: 16px;
+    width: 100%;
+    position: relative;
+    box-sizing: border-box;
+    border: 0;
+    display: block;
+    background-color: #f7f7f7;
+    font-size: 14px;
+    font-weight: bold;
+}
+div.word-bank-modal input, div.word-bank-modal select {
+    outline: none;
+}
+div.words div.word:last-child {
+    padding-bottom: 8px;
+}
+div.words div.word:first-child {
+    padding-top: 8px;
+}
+
+div.word-bank-modal div.words {
+    overflow-x: hidden;
+    overflow-y: auto;
+    height: 100%;
+}
+
+div.color-select {
+    width: 100%;
+    height: 48px;
+    display: flex;
+    box-sizing: border-box;
+    padding: 0px 0px 0px 0px;
+    margin: 0px 0px 4px 0px;
+}
+
+div.color-select div {
+    width: 100%;
+    height: 100%;
+    margin: 0px 4px;
+}
+
+div.color-select div.selected::after {
+    content: "";
+    position: relative;
+    display: block;
+    width: 20px;
+    height: 20px;
+    background-color: white;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
 }

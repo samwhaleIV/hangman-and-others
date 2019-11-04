@@ -1,5 +1,7 @@
 var DEBUG_PAGE = null;
 
+var LOCAL_STORAGE_KEY = "hangman_word_banks";
+
 var ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 var pages = [{
@@ -12,7 +14,7 @@ var pages = [{
     ID: "word-search"
 },{
     ID: "word-banks",
-    backgroundColor: "#080808"
+    backgroundColor: "#0a0a0a"
 }];
 function ScrollToTop() {
     document.body.scrollTop = 0;
@@ -71,7 +73,7 @@ function ResetHearts() {
     }
 }
 function ProcessPageData() {
-    for(let i = 0;i<pages.length;i++) {
+    for(var i = 0;i<pages.length;i++) {
         var page = pages[i];
         var pageElement = document.getElementById(page.ID);
         if(page.backgroundColor) {
@@ -95,7 +97,7 @@ function GameLetterClicked(letter,element) {
     pressedButtons.push(element);
 }
 function ResetGameKeyboard() {
-    for(let i = 0;i<pressedButtons.length;i++) {
+    for(var i = 0;i<pressedButtons.length;i++) {
         pressedButtons[i].resetForGame();
     }
     pressedButtons.splice(0);
@@ -118,6 +120,7 @@ var wordSearchPage = pages[2];
 var wordBanksPage = pages[3];
 
 function GetRandomHangmanSentence() {
+    //todo - use activeWordBank
     return "THIS IS A TEST SENTENCE";
 }
 
@@ -197,7 +200,15 @@ function LoadHangman() {
     });
 }
 
-var wordBanks = [];
+var wordBanks = null;
+var nextWordBankID = 0;
+var colors = ["green","purple","blue","orange","red"];
+function GetNewWordBankID() {
+    return ++nextWordBankID;
+}
+function GetNextRandomColor() {
+    return colors[nextWordBankID%colors.length];
+}
 LoadWordBanks();
 
 var menuButtons = mainMenu.querySelectorAll(
@@ -214,10 +225,13 @@ menuButtons[2].addEventListener(
 );
 
 var wordArea = document.getElementById("word-area");
+var wordBanksElement = document.body.querySelector(
+    "div#word-banks div.word-banks"
+);
 
 var currentWordCache = null;
 function MapWordToParagraphs(target,word,cache) {
-    for(let i = 0;i<word.length;i++) {
+    for(var i = 0;i<word.length;i++) {
         var paragraph = document.createElement("p");
         var letter = word.charAt(i);
         paragraph.appendChild(
@@ -255,7 +269,7 @@ function WordBankRequiredPrefix() {
             {text:"Not right now",type:"bad"}
         ],function(callbackID){
             if(callbackID === 0) {
-                ShowPage(wordBanksPage,ReturnToMainMenu);
+                ShowWordBankPage();
             }
         });
         return true;
@@ -263,19 +277,19 @@ function WordBankRequiredPrefix() {
         return false;
     }
 }
-function MenuButton1Clicked(event) {
+function MenuButton1Clicked() {
     if(WordBankRequiredPrefix()) {
         return;
     }
     LoadHangman();
 }
-function MenuButton2Clicked(event) {
+function MenuButton2Clicked() {
     if(WordBankRequiredPrefix()) {
         return;
     }
 }
-function MenuButton3Clicked(event) {
-    ShowPage(wordBanksPage,ReturnToMainMenu);
+function MenuButton3Clicked() {
+    ShowWordBankPage();
 }
 
 function ShowPage(page,exitCallback) {
@@ -286,8 +300,10 @@ function ShowPage(page,exitCallback) {
     activePage.classList.remove("hidden");
     if(activePage.backgroundColor) {
         document.body.style.backgroundColor = activePage.backgroundColor;
+        document.body.style.borderColor = activePage.backgroundColor;
     } else {
         delete document.body.style.backgroundColor;
+        delete document.body.style.borderColor;
     }
     if(exitCallback) {
         exitButton.classList.remove("hidden");
@@ -307,10 +323,14 @@ function TestCustomPrompt() {
         console.log("Callback ID: " + callbackID);
     });
 }
-function CustomPrompt(title,message,buttons,callback,target) {
-    if(!target) {
-        target = document.body;
-    }
+function EnableGlobalScroll() {
+    target.classList.remove("no-scroll");
+}
+function DisableGlobalScroll() {
+    target.classList.add("no-scroll");
+}
+function CustomPrompt(title,message,buttons,callback) {
+    target = document.body;
     var popup = document.createElement("div");
     popup.className = "popup";
     var callbackProxy = function(event) {
@@ -319,7 +339,7 @@ function CustomPrompt(title,message,buttons,callback,target) {
             callback(buttonCallbackID);
         }
         target.removeChild(popup);
-        target.classList.remove("no-scroll");
+        EnableGlobalScroll();
     }
     var innerPopup = document.createElement("div");
     innerPopup.className = "inner-popup";
@@ -353,7 +373,7 @@ function CustomPrompt(title,message,buttons,callback,target) {
     innerPopup.appendChild(buttonContainer);
     popup.appendChild(innerPopup);
 
-    target.classList.add("no-scroll");
+    DisableGlobalScroll();
     target.appendChild(popup);
 }
 function GetPromptButton(text,type,callback) {
@@ -364,14 +384,249 @@ function GetPromptButton(text,type,callback) {
     button.addEventListener("click",callback,true);
     return button;
 }
-function CreateHangmanAlphabet() {
+function CreateWordBankCreationEntry(createCallback) {
+    var wordBank = document.createElement("div");
+    wordBank.className = "word-bank green";
+    
+    var heading = document.createElement("h1");
+    heading.appendChild(document.createTextNode(
+        "Create Word Bank"
+    ));
+
+    var description = document.createElement("p");
+    description.appendChild(document.createTextNode(
+        "You need to make a word bank before you can play games"
+    ));
+
+    var actionContainer = document.createElement("div");
+    actionContainer.className = "action-container";
+    AddWordBankButton(
+        actionContainer,"Create",createCallback,null
+    );
+
+    wordBank.appendChild(heading);
+    wordBank.appendChild(description);
+    wordBank.appendChild(actionContainer);
+
+    return wordBank;
+}
+function PrettifyWordBankList(words) {
+    if(words.length) {
+        var wordsBuffer = "Words: ";
+        for(var i = 0;i < words.length;i++) {
+            var word = words[i];
+            words[i] = word.charAt(0).toUpperCase() + word.slice(1);
+        }
+        wordsBuffer += words.join(", ");
+        return wordsBuffer;
+    } else {
+        return "This word bank is empty :(";
+    }
+}
+function AddWordBankButton(target,name,callback,callbackID) {
+    var button = document.createElement("button");
+    button.callbackID = callbackID;
+    button.appendChild(document.createTextNode(name));
+    if(callback) {
+        button.addEventListener("click",callback,true);
+    }
+    target.appendChild(button);
+}
+function CreateWordBank(
+    wordBankID,title,words,color,forSelection,firstCallback,secondCallback
+) {
+    var wordBank = document.createElement("div");
+    wordBank.className = "word-bank " + color;
+    
+    var heading = document.createElement("h1");
+    heading.appendChild(document.createTextNode(title));
+
+    words = PrettifyWordBankList(words);
+
+    var description = document.createElement("p");
+    description.appendChild(document.createTextNode(words));
+
+    var actionContainer = document.createElement("div");
+    actionContainer.className = "action-container";
+
+    if(forSelection) {
+        AddWordBankButton(
+            actionContainer,"Select",firstCallback,wordBankID
+        );
+    } else {
+        AddWordBankButton(
+            actionContainer,"Edit",firstCallback,wordBankID
+        );
+        AddWordBankButton(
+            actionContainer,"Delete",secondCallback,wordBankID
+        );
+    }
+
+    wordBank.appendChild(heading);
+    wordBank.appendChild(description);
+    wordBank.appendChild(actionContainer);
+
+    return wordBank;
+}
+function PopulateWordBankList(
+    forSelection,createCallback,firstCallback,secondCallback
+) {
+    ClearWordBankList();
+    if(!forSelection) {
+        var creationEntry = CreateWordBankCreationEntry(createCallback);
+        wordBanksElement.appendChild(creationEntry);
+    }
+    for(var i = 0;i<wordBanks.length;i++) {
+        var wordBank = wordBanks[i];
+        var wordBankElement = CreateWordBank(
+            wordBank.ID,wordBank.title,wordBank.words,
+            wordBank.color,
+            forSelection,firstCallback,secondCallback
+        )
+        wordBanksElement.appendChild(wordBankElement);
+    }
+}
+function ClearWordBankList() {
+    while(wordBanksElement.lastChild) {
+        wordBanksElement.removeChild(wordBanksElement.lastChild);
+    }
+}
+function GetWordBankByID(ID) {
+    for(var i = 0;i<wordBanks.length;i++) {
+        var wordBank = wordBanks[i];
+        if(wordBank.ID === ID) {
+            return wordBank;
+        }
+    }
+    return null;
+}
+function DeleteWordBankByID(ID) {
+    for(var i = 0;i<wordBanks.length;i++) {
+        var wordBank = wordBanks[i];
+        if(wordBank.ID === ID) {
+            wordBanks.splice(i,1);
+            return;
+        }
+    }
+}
+function EditWordBankByID(ID,editCallback) {
+    var wordBank = GetWordBankByID(ID);
+    //todo
+    var didEdit = false;
+    if(didEdit && editCallback) {
+       editCallback();
+    }
+}
+function GetNewWordBankObject() {
+    return {
+        title: "Untitled Word Bank",
+        words: [],
+        ID: GetNewWordBankID(),
+        color: GetNextRandomColor()
+    }
+}
+function GetColorSelect(updatedCallback) {
 
 }
-function LoadWordBanks() {
+function ShowWordBankModal(callback) {
+
+    /*
+
+    <div class="popup">
+        <div class="word-bank-modal">
+            <input type="text" class="title" placeholder="Untitled Word Bank"></input>
+            <div class="words">
+                <div class="word">
+                    <div class="color-select">
+                        <div class="green selected"></div>
+                        <div class="purple"></div>
+                        <div class="blue"></div>
+                        <div class="orange"></div>
+                        <div class="red"></div>
+                    </div>
+                </div>
+                <div class="word">
+                    <input type="text" placeholder="New word..."></input>
+                    <select>
+                        <option value="noun">Noun</option>
+                        <option value="adjective">Adjective</option>
+                        <option value="verb">Verb</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    */
+}
+function CreateNewWordBank(createCallback) {
     //todo
+    var didCreate = false;
+    if(didCreate && createCallback) {
+        createCallback();
+    }
+}
+function ShowWordBankPage() {
+    ShowPage(wordBanksPage,ReturnToMainMenu);
+    function refresh() {
+        PopulateWordBankList(false,function(){
+            CreateNewWordBank(refresh);
+        },function(editEvent){
+            var wordBankID = editEvent.currentTarget.callbackID;
+            EditWordBankByID(wordBankID,refresh);
+        },function(deleteEvent){
+            var wordBankID = deleteEvent.currentTarget.callbackID;
+            CustomPrompt(
+                "Warning!","If you delete this word bank, you can't get it back!",[
+                {text:"Do not delete",type:"good"},
+                {text:"Delete",type:"bad"}
+            ],function(callbackID){
+                console.log("Yeet")
+                if(callbackID === 1) {
+                    DeleteWordBankByID(wordBankID);
+                    refresh();
+                }
+            });
+        });
+    }
+    refresh();
+}
+function ShowWordSelectionPage(callback,cancelCallback) {
+    ShowPage(wordBanksPage,cancelCallback);
+    PopulateWordBankList(true,null,function(selectEvent){
+        var wordBankID = selectEvent.currentTarget.callbackID;
+        activeWordBank = GetWordBankByID(wordBankID);
+        if(callback) {
+            callback();
+        }
+    },null);
+}
+function LoadWordBanks() {
+    var data = localStorage.getItem(
+        LOCAL_STORAGE_KEY
+    );
+    if(data !== null) {
+        wordBanks = JSON.parse(data);
+    } else {
+        wordBanks = [];
+    }
+    for(var i = 0;i<wordBanks.length;i++) {
+        var wordBank = wordBanks[i];
+        if(!wordBank.color) {
+            wordBank.color = "green";
+        }
+        if(wordBank.ID >= nextWordBankID) {
+            nextWordBankID = wordBank.ID + 1;
+        }
+    }
 }
 function SaveWordBanks() {
-    //todo
+    var saveData = JSON.stringify(wordBanks);
+    localStorage.setItem(
+        LOCAL_STORAGE_KEY,
+        saveData
+    );
 }
 
 if(DEBUG_PAGE === null) {
