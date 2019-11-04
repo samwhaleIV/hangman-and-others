@@ -140,7 +140,7 @@ function HangmanEndGameCallback(callbackID) {
         RefreshHangmanSentence();
     } else {
         letterCallback = null;
-        ShowPage(mainMenu,null);
+        ReturnToMainMenu();
     }
 }
 var HangmanEndGameButtons = [
@@ -191,7 +191,7 @@ function LoadHangman() {
         ],function(callbackID){
             if(callbackID === 0) {
                 letterCallback = null;
-                ShowPage(mainMenu,null);
+                ReturnToMainMenu();
             }
         });
     });
@@ -244,6 +244,10 @@ function PopulateWordArea(sentence) {
     }
 }
 
+function ReturnToMainMenu() {
+    ShowPage(mainMenu,null);
+}
+
 function WordBankRequiredPrefix() {
     if(!wordBanks.length) {
         CustomPrompt("Slow down there!","You need to create a word bank first!",[
@@ -251,7 +255,7 @@ function WordBankRequiredPrefix() {
             {text:"Not right now",type:"bad"}
         ],function(callbackID){
             if(callbackID === 0) {
-                ShowPage(wordBanksPage);
+                ShowPage(wordBanksPage,ReturnToMainMenu);
             }
         });
         return true;
@@ -271,9 +275,7 @@ function MenuButton2Clicked(event) {
     }
 }
 function MenuButton3Clicked(event) {
-    ShowPage(wordBanksPage,function(){
-        ShowPage(mainMenu,null);
-    });
+    ShowPage(wordBanksPage,ReturnToMainMenu);
 }
 
 function ShowPage(page,exitCallback) {

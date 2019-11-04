@@ -313,9 +313,10 @@ div#word-banks h1 {
     margin: 8px;
     padding: 0;
     font-family: sans-serif;
-    font-size: 32px;
+    font-size: 28px;
     color: white;
     margin-bottom: 12px;
+    user-select: none;
 }
 
 div.word-banks div {
@@ -323,7 +324,7 @@ div.word-banks div {
     width: 100%;
     box-sizing: border-box;
     margin-bottom: 0;
-    margin-bottom: 24px;
+    margin-bottom: 22px;
 }
 
 div.word-banks div:nth-child() {
@@ -364,7 +365,7 @@ div.word-banks div div.action-container button {
 
 div#word-banks div.word-banks div h1 {
     margin: 0;
-    font-size: 20px;
+    font-size: 18px;
     padding: 16px;
     background-color: rgb(178, 92, 92);
     color: white;
