@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Hangman & Others</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="exit-button">Exit</button>
+    <div id="main-menu" class="center-page fill hidden">
+        <div class="grid">
+            <div class="grid-item">
+                <h1>Hangman</h1>
+                <div class="image-container">
+                    <div class="image" style="background-image: url(images/menu-1.png)"></div>
+                </div>
+            </div>
+            <div class="grid-item">
+                <h1>Word Search</h1>
+                <div class="image-container">
+                    <div class="image" style="background-image: url(images/menu-2.png)"></div>
+                </div>
+            </div>
+            <div class="grid-item">
+                <h1>Word Banks</h1>
+                <div class="image-container">
+                    <div class="image" style="background-image: url(images/menu-3.png)"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="hangman" class="center-page hidden">
+        <div id="hearts"></div>
+        <div id="game-area">
+            <div id="word-area"></div>
+        </div>
+        <div id="alphabet"></div>
+        <script>
+    </script>
+    </div>
+    <div id="word-search" class="page hidden"></div>
+    <div id="word-banks" class="page hidden"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>

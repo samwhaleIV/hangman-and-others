@@ -1,0 +1,306 @@
+html, body {
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    margin: 0;
+}
+body {
+    background-color: white;
+    color: black;
+}
+.hidden {
+    display: none !important;
+}
+.no-scroll {
+    overflow: hidden;
+}
+div.center-page {
+    padding: 4px;
+    top: 50%;
+    transform: translateY(-50%);
+    position: relative;
+}
+div.page {
+    top: 0;
+    left: 0;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    padding: 8px;
+}
+div.grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    grid-gap: 4px;
+}
+div.grid div.grid-item {
+    width: 350px;
+    height: 350px;
+    background-color: #D8D8D8;
+    margin: 4px;
+    outline-width: 0;
+    outline-style: solid;
+    outline-offset: 0;
+    outline-color: black;
+}
+div.grid div.grid-item:hover {
+    outline-width: 2px;
+}
+/* Start Popup Prompt */
+div.popup {
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: #e6e6e6f0;
+    box-sizing: border-box;
+    padding: 8px;
+}
+div.popup div.inner-popup {
+    background-color: white;
+    color: black;
+    width: 800px;
+    height: 400px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    position: relative;
+    padding: 8px;
+    max-width: 100%;
+    max-height: 100%;
+    user-select: none;
+    box-sizing: border-box;
+}
+div.button-container {
+    position: absolute;
+    bottom: 0;
+    padding-bottom: inherit;
+    height: 48px;
+    margin-left: auto;
+    margin-right: auto;
+    display: flex;
+    justify-content: center;
+    left: 4px;
+    padding-top: 8px;
+    right: 4px;
+}
+div.button-container button {
+    height: 100%;
+    margin-left: 4px;
+    margin-right: 4px;
+    font-family: sans-serif;
+    font-size: 16px;
+    flex-grow: 1;
+}
+div.button-container button:focus {
+    outline: none;
+}
+div.button-container button.good:hover,
+div.button-container button.bad:hover {
+    background-color: #313131;
+}
+div.button-container button.good,
+div.button-container button.bad,
+button.exit-button {
+    padding: 4px;
+    color: white;
+    border: 0;
+    transition-duration: 0.2s;
+    transition-property: background-color;
+}
+div.button-container button.good {
+    background-color: #43a343;
+}
+div.button-container button.bad {
+    background-color: #da4747;
+}
+div.inner-popup div.inner-popup-text {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 100%;
+    left: 0;
+}
+div.inner-popup-text h1 {
+    margin: 4px;
+    padding: 0;
+    text-align: center;
+    font-size: 36px;
+    font-family: sans-serif;
+    padding: 4px;
+}
+div.inner-popup-text p {
+    margin: 0;
+    padding: 0;
+    text-align: center;
+    font-size: 18px;
+    font-family: sans-serif;
+    margin: 4px;
+    padding: 4px;
+}
+/* End Popup Prompt */
+@media only screen and (max-width: 741px), 
+       only screen and (min-width: 742px) and (max-height: 733px) {
+    div.center-page.fill {
+        top: 0%;
+        transform: none;
+    }
+    div.center-page.fill div.grid div.grid-item {
+        width: 100%;
+    }
+    div#alphabet p {
+        width: 38px !important;
+        line-height: 38px !important;
+    }
+}
+div#main-menu div.grid-item {
+    display: flex;
+    flex-flow: column;
+}
+div#main-menu div.grid-item h1 {
+    margin: 0;
+    text-align: center;
+    padding: 8px;
+    font-family: sans-serif;
+    font-weight: normal;
+    color: #fff;
+    font-size: 20px;
+    user-select: none;
+    background-color: #0000002e;
+}
+div#main-menu div.grid-item:nth-child(1) {
+    background-color: #00D890;
+    outline-color: #008d5f;
+}
+div#main-menu div.grid-item:nth-child(2) {
+    background-color: #00D1D8;
+    outline-color: #00888d;
+}
+div#main-menu div.grid-item:nth-child(3) {
+    background-color: #9700D8;
+    outline-color: #1e002b;
+}
+div.image-container {
+    padding: 8px;
+    height: 100%;
+}
+div.image-container .image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: 50% 50%;
+    user-select: none;
+}
+
+div#hangman {
+    padding: 8px;
+    background-color: #fff;
+}
+
+div#alphabet {
+    display: flex;
+    justify-content: center;
+    user-select: none;
+    flex-wrap: wrap;
+    width: 710px;
+    margin-left: auto;
+    margin-right: auto;
+    background-color: #752775;
+    box-sizing: border-box;
+    padding: 4px;
+    max-width: 100%;
+}
+
+div#alphabet p {
+    width: 70px;
+    padding: 0;
+    text-align: center;
+    line-height: 70px;
+    font-family: sans-serif;
+    background-color: #9c439c;
+    color: #fff;
+    font-size: 16px;
+    margin: 4px;
+}
+div#alphabet p:hover {
+    background-color: #c479d7;
+}
+div#alphabet p.disabled {
+    color: #000;
+    background-color: #fff;
+    font-weight: bold;
+}
+
+div#hearts {
+    display: flex;
+    justify-content: center;
+}
+
+div#hearts img {
+    width: 102px;
+    image-rendering: pixelated;
+    margin: 0px 4px;
+    user-select: none;
+}
+div#game-area {
+    background-color: #350b3e;
+    margin: 8px auto;
+    width: 710px;
+    box-sizing: border-box;
+    max-width: 100%;
+}
+div#word-area p,
+div#word-area div.space {
+    margin: 0;
+}
+div#word-area p {
+    border-bottom: 4px solid #fff;
+    margin: 4px;
+    font-family: sans-serif;
+    font-size: 48px;
+    color: #fff;
+    line-height: 48px;
+    width: 48px;
+    text-align: center;
+    margin: 8px 2px;
+}
+div#word-area div.space {
+    height: 48px;
+    width: 22px;
+}
+div#word-area p:not(.guessed) {
+    color: transparent;
+}
+
+div#word-area {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 12px;
+    user-select: none;
+}
+
+button.exit-button {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 220px;
+    height: 60px;
+    margin: 8px;
+    border: none;
+    background-color: #101010;
+    z-index: 1;
+}
+button.exit-button:hover {
+    background-color: #1d1d1d;
+}
+button.exit-button:focus {
+    outline: none;
+}
