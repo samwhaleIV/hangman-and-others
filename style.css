@@ -60,6 +60,7 @@ div.popup {
     background-color: #e6e6e6f0;
     box-sizing: border-box;
     padding: 8px;
+    z-index: 2;
 }
 div.popup div.inner-popup {
     background-color: white;
@@ -133,6 +134,7 @@ div.inner-popup-text h1 {
     font-size: 36px;
     font-family: sans-serif;
     padding: 4px;
+    color: black;
 }
 div.inner-popup-text p {
     margin: 0;
@@ -291,16 +293,84 @@ button.exit-button {
     position: fixed;
     top: 0;
     left: 0;
-    width: 220px;
-    height: 60px;
-    margin: 8px;
+    width: 200px;
+    height: 65px;
+    margin: 0px;
     border: none;
-    background-color: #101010;
+    background-color: #ffffff;
     z-index: 1;
+    color: black;
 }
 button.exit-button:hover {
-    background-color: #1d1d1d;
+    background-color: #d0d0d0;
 }
 button.exit-button:focus {
     outline: none;
+}
+
+div#word-banks h1 {
+    text-align: center;
+    margin: 8px;
+    padding: 0;
+    font-family: sans-serif;
+    font-size: 32px;
+    color: white;
+    margin-bottom: 12px;
+}
+
+div.word-banks div {
+    background-color: #fff;
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 0;
+    margin-bottom: 24px;
+}
+
+div.word-banks div:nth-child() {
+
+}
+
+div.word-banks {
+    width: 525px;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 100%;
+}
+
+div.word-banks div p {
+    font-family: sans-serif;
+    font-size: 16px;
+    margin: 0;
+    box-sizing: border-box;
+    text-align: left;
+    padding: 12px;
+    font-weight: bold;
+    padding-bottom: 10px;
+}
+
+div.word-banks div div.action-container {
+    padding: 8px;
+    padding-top: 0;
+}
+
+div.word-banks div div.action-container button {
+    width: 200px;
+    height: 40px;
+    padding: 0;
+    display: block;
+    width: 100%;
+    margin-top: 8px;
+}
+
+div#word-banks div.word-banks div h1 {
+    margin: 0;
+    font-size: 20px;
+    padding: 16px;
+    background-color: rgb(178, 92, 92);
+    color: white;
+    text-align: left;
+}
+
+div#word-banks {
+    padding-top: 65px;
 }

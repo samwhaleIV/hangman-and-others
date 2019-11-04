@@ -11,9 +11,13 @@ var pages = [{
 },{
     ID: "word-search"
 },{
-    ID: "word-banks"
+    ID: "word-banks",
+    backgroundColor: "#080808"
 }];
-
+function ScrollToTop() {
+    document.body.scrollTop = 0;
+    document.documentElement.scrollTop = 0;
+}
 function CreateKeyboard(){
     var alphabetElement = document.getElementById("alphabet");
     function letterReset() {
@@ -118,8 +122,14 @@ function GetRandomHangmanSentence() {
 }
 
 var currentSentence = null;
+var activeWordBank = null;
 function RefreshHangmanSentence() {
-    var newSentence = GetRandomHangmanSentence();
+    var newSentence;
+    if(activeWordBank && activeWordBank.length) {
+        newSentence = "FEATURE NOT YET COMPLETE";
+    } else {
+        newSentence = GetRandomHangmanSentence();
+    }
     currentSentence = newSentence;
     PopulateWordArea(newSentence);
 }
@@ -154,7 +164,6 @@ function TryCompleteHangmanGame() {
             HangmanEndGameCallback
         );
     }
-
 }
 function HangmanLetterCallback(letter) {
     var bucket = currentWordCache[letter];
@@ -237,7 +246,7 @@ function PopulateWordArea(sentence) {
 
 function WordBankRequiredPrefix() {
     if(!wordBanks.length) {
-        CustomPrompt("Slow down there!","You need to create a word bank first.",[
+        CustomPrompt("Slow down there!","You need to create a word bank first!",[
             {text:"Proceed",type:"good"},
             {text:"Not right now",type:"bad"}
         ],function(callbackID){
@@ -254,6 +263,7 @@ function MenuButton1Clicked(event) {
     if(WordBankRequiredPrefix()) {
         return;
     }
+    LoadHangman();
 }
 function MenuButton2Clicked(event) {
     if(WordBankRequiredPrefix()) {
@@ -261,7 +271,9 @@ function MenuButton2Clicked(event) {
     }
 }
 function MenuButton3Clicked(event) {
-
+    ShowPage(wordBanksPage,function(){
+        ShowPage(mainMenu,null);
+    });
 }
 
 function ShowPage(page,exitCallback) {
@@ -282,6 +294,7 @@ function ShowPage(page,exitCallback) {
         exitButton.classList.add("hidden");
         exitButtonCallback = null;
     }
+    ScrollToTop();
 }
 function TestCustomPrompt() {
     CustomPrompt(
