@@ -325,8 +325,8 @@ function ShowPage(page,exitCallback) {
         document.body.style.backgroundColor = activePage.backgroundColor;
         document.body.style.borderColor = activePage.backgroundColor;
     } else {
-        delete document.body.style.backgroundColor;
-        delete document.body.style.borderColor;
+        document.body.style.backgroundColor = "";
+        document.body.style.borderColor = "";
     }
     if(exitCallback) {
         exitButton.classList.remove("hidden");
@@ -691,7 +691,7 @@ function ShowWordBankModal(callback) {
         exit();
         exitButtonCallback = oldListener;
         exitButton.style.border = oldBorder;
-        delete exitButton.style.zIndex;
+        exitButton.style.zIndex = "";
     }
 
     var popupModal = document.createElement("div");
