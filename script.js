@@ -779,6 +779,7 @@ function ShowWordBankModal(callback) {
             wordDeleted.bind(newWord)
         ),wordBankList.lastChild);
         activeWordBank.words.push(newWord);
+        wordBankList.lastChild.scrollIntoView();
     }
 
     function layoutWords() {
