@@ -60,7 +60,7 @@ div.popup {
     background-color: #e6e6e6f0;
     box-sizing: border-box;
     padding: 8px;
-    z-index: 2;
+    z-index: 100;
 }
 div.popup div.inner-popup {
     background-color: white;
@@ -98,7 +98,7 @@ div.button-container button {
     font-size: 16px;
     flex-grow: 1;
 }
-div.button-container button:focus {
+div.button-container button {
     outline: none;
 }
 div.button-container button.good:hover,
@@ -247,6 +247,7 @@ div#hearts {
 
 div#hearts img {
     width: 102px;
+    /* height: 102px; */
     image-rendering: pixelated;
     margin: 0px 4px;
     user-select: none;
@@ -298,7 +299,7 @@ button.exit-button {
     margin: 0px;
     border: none;
     background-color: #ffffff;
-    z-index: 1;
+    z-index: 50;
     color: black;
     border-style: solid;
     border-width: 2px;
@@ -307,9 +308,9 @@ button.exit-button {
     border-color: inherit;
 }
 button.exit-button:hover {
-    background-color: #b4b4b4;
+    background-color: #e3e3e3;
 }
-button.exit-button:focus {
+button.exit-button {
     outline: none;
 }
 
@@ -453,10 +454,12 @@ div.word-bank-modal input.title {
     background-color: #f7f7f7;
     font-size: 14px;
     font-weight: bold;
+    padding-left: 94px;
 }
 div.word-bank-modal input,
 div.word-bank-modal select,
-div.words div.word button {
+div.words div.word button,
+div.word-bank-modal div.banner-wrapper button {
     outline: none;
     user-select: none;
 }
@@ -500,7 +503,7 @@ div.color-select div.selected::after {
     transform: translate(-50%,-50%);
 }
 
-div.words div.word button {
+div.words div.word button, div.word-bank-modal div.banner-wrapper button {
     display: block;
     height: 100%;
     box-sizing: border-box;
@@ -512,6 +515,14 @@ div.words div.word button {
     transition-duration: 0.2s;
     transition-property: background-color;
 }
+div.word-bank-modal div.banner-wrapper button {
+
+margin: 0;
+
+height: 48px;
+
+width: 78px;
+}
 div.words div.word button:hover {
     background-color: #da4747;
 }
@@ -521,6 +532,16 @@ div.words div.word button.create {
     margin-left: auto;
     margin-right: auto;
 }
-div.words div.word button.create:hover {
+div.words div.word button.create:hover,
+div.word-bank-modal div.banner-wrapper button:hover {
     background-color: #787878;
+}
+
+
+.banner-wrapper {
+    display: flex;
+}
+
+div.banner-wrapper button {
+    width: 80px;
 }

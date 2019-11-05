@@ -712,19 +712,24 @@ function ShowWordBankModal(callback) {
     }
 
     var oldListener = exitButtonCallback;
-    exitButton.style.zIndex = 3;
     var oldBorder = exitButton.style.border;
-    exitButton.style.border = "none";
 
+    exitButton.style.border = "none";
     exitButtonCallback = function() {
         exitButtonCallback = oldListener;
         exitButton.style.border = oldBorder;
-        exitButton.style.zIndex = "";
         exit();
     }
 
     var popupModal = document.createElement("div");
     popupModal.className = "word-bank-modal";
+    
+    var bannerWrapper = document.createElement("div");
+    bannerWrapper.className = "banner-wrapper";
+
+    var closeButton = document.createElement("button");
+    closeButton.appendChild(document.createTextNode("Exit"));
+    closeButton.addEventListener("click",exitButtonCallback,true);
 
     var titleInput = document.createElement("input");
     titleInput.className = "title";
@@ -738,7 +743,10 @@ function ShowWordBankModal(callback) {
         activeWordBank.title = titleInput.value;
     });
 
-    popupModal.appendChild(titleInput);
+    bannerWrapper.appendChild(titleInput);
+    bannerWrapper.appendChild(closeButton);
+
+    popupModal.appendChild(bannerWrapper);
 
     var wordBankList = document.createElement("div");
     wordBankList.classList = "words";
