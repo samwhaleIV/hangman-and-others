@@ -297,7 +297,26 @@ function WordBankRequiredPrefix() {
         });
         return true;
     } else {
-        return false;
+        var hasValidBank = false;
+        for(var i = 0;i<wordBanks.length;i++) {
+            if(wordBanks[i].words.length) {
+                hasValidBank = true;
+                break;
+            }
+        }
+        if(!hasValidBank) {
+            CustomPrompt("Whoops!","None of your word banks have words in them! Would you like to edit them?",[
+                {text:"Yes, edit them",type:"good"},
+                {text:"No, not right now",type:"bad"}  
+            ],function(callbackID){
+                if(callbackID === 0) {
+                    ShowWordBankPage();
+                }
+            });
+            return true;
+        } else {
+            return false;
+        }
     }
 }
 function MenuButton1Clicked() {
@@ -307,6 +326,10 @@ function MenuButton1Clicked() {
     ShowWordSelectionPage(LoadHangman,null);
 }
 function MenuButton2Clicked() {
+    CustomPrompt("Sorry...","I have still not made this yet.",[
+        {text:"Okay :(",type:"none"}
+    ]);
+    return;
     if(WordBankRequiredPrefix()) {
         return;
     }
@@ -353,16 +376,19 @@ function DisableGlobalScroll() {
     document.body.classList.add("no-scroll");
 }
 function CustomPrompt(title,message,buttons,callback) {
+    var exitCallback = exitButtonCallback;
+    exitButtonCallback = null;
     target = document.body;
     var popup = document.createElement("div");
     popup.className = "popup";
     var callbackProxy = function(event) {
+        exitButtonCallback = exitCallback;
         var buttonCallbackID = event.currentTarget.callbackID;
+        target.removeChild(popup);
+        EnableGlobalScroll();
         if(callback) {
             callback(buttonCallbackID);
         }
-        target.removeChild(popup);
-        EnableGlobalScroll();
     }
     var innerPopup = document.createElement("div");
     innerPopup.className = "inner-popup";
@@ -502,6 +528,9 @@ function PopulateWordBankList(
     }
     for(var i = 0;i<wordBanks.length;i++) {
         var wordBank = wordBanks[i];
+        if(forSelection && !wordBank.words.length) {
+            continue;
+        }
         var wordBankElement = CreateWordBank(
             wordBank.ID,wordBank.title,wordBank.words,
             wordBank.color,
@@ -688,10 +717,10 @@ function ShowWordBankModal(callback) {
     exitButton.style.border = "none";
 
     exitButtonCallback = function() {
-        exit();
         exitButtonCallback = oldListener;
         exitButton.style.border = oldBorder;
         exitButton.style.zIndex = "";
+        exit();
     }
 
     var popupModal = document.createElement("div");
