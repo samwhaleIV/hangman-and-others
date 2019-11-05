@@ -347,10 +347,10 @@ function TestCustomPrompt() {
     });
 }
 function EnableGlobalScroll() {
-    target.classList.remove("no-scroll");
+    document.body.classList.remove("no-scroll");
 }
 function DisableGlobalScroll() {
-    target.classList.add("no-scroll");
+    document.body.classList.add("no-scroll");
 }
 function CustomPrompt(title,message,buttons,callback) {
     target = document.body;
