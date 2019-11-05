@@ -1,8 +1,24 @@
 var DEBUG_PAGE = null;
 
 var LOCAL_STORAGE_KEY = "hangman_word_banks";
-
 var ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+var ALPHABET_LOOKUP = {};
+
+for(var i = 0;i<ALPHABET.length;i++) {
+    ALPHABET_LOOKUP[ALPHABET.charAt(i)] = true;
+}
+
+var DEFAULT_BANK_TITLE = "Untitled Word Bank"
+var WORD_TYPES = [
+    "noun","adjective",
+    "verb","other"
+];
+var WORD_TYPES_DISPLAY = [];
+for(var i = 0;i<WORD_TYPES.length;i++) {
+    var type = WORD_TYPES[i];
+    WORD_TYPES_DISPLAY[i] = type.charAt(0).toUpperCase() + type.slice(1);
+}
 
 var pages = [{
     ID: "main-menu",
@@ -120,7 +136,9 @@ var wordSearchPage = pages[2];
 var wordBanksPage = pages[3];
 
 function GetRandomHangmanSentence() {
-    //todo - use activeWordBank
+    return activeWordBank.words[
+        Math.floor(Math.random() * activeWordBank.words.length)
+    ].text;
     return "THIS IS A TEST SENTENCE";
 }
 
@@ -149,16 +167,20 @@ function HangmanEndGameCallback(callbackID) {
 var HangmanEndGameButtons = [
     {text:"Keep playing",type:"good"},
     {text:"Stop playing",type:"bad"},
-]
+];
+var hangmanGameIsSentence = false;
 function TryCompleteHangmanGame() {
     var title = null;
     var message = null;
+    currentSentence = currentSentence.toLowerCase();
+    currentSentence = currentSentence.charAt(0).toUpperCase() + currentSentence.slice(1);
     if(currentWordCache.failed === heartCount) {
         title = "Game over!";
-        message = "Sentence: \"" + currentSentence + "\"";
+        message = "Darn! So close. Answer: " + currentSentence;
     } else if(currentWordCache.completed === currentWordCache.total) {
+        var wordOrSentence = hangmanGameIsSentence ? "sentence" : "word";
         title = "Yay!";
-        message = "You guessed the sentence: \"" + currentSentence + "\"";
+        message = "You guessed the " + wordOrSentence + ": " + currentSentence;
     }
     if(title) {
         CustomPrompt(
@@ -248,6 +270,7 @@ function PopulateWordArea(sentence) {
     }
     currentWordCache = GetDefaultWordCache();
     sentence = sentence.split(" ");
+    hangmanGameIsSentence = sentence.length >= 2;
     for(var i = 0;i<sentence.length;i++) {
         MapWordToParagraphs(wordArea,sentence[i],currentWordCache);
         if(i < sentence.length-1) {
@@ -281,7 +304,7 @@ function MenuButton1Clicked() {
     if(WordBankRequiredPrefix()) {
         return;
     }
-    LoadHangman();
+    ShowWordSelectionPage(LoadHangman,null);
 }
 function MenuButton2Clicked() {
     if(WordBankRequiredPrefix()) {
@@ -411,10 +434,11 @@ function CreateWordBankCreationEntry(createCallback) {
     return wordBank;
 }
 function PrettifyWordBankList(words) {
+    words = words.slice(0);
     if(words.length) {
         var wordsBuffer = "Words: ";
         for(var i = 0;i < words.length;i++) {
-            var word = words[i];
+            var word = words[i].text.toLowerCase();
             words[i] = word.charAt(0).toUpperCase() + word.slice(1);
         }
         wordsBuffer += words.join(", ");
@@ -511,70 +535,276 @@ function DeleteWordBankByID(ID) {
 }
 function EditWordBankByID(ID,editCallback) {
     var wordBank = GetWordBankByID(ID);
-    //todo
-    var didEdit = false;
-    if(didEdit && editCallback) {
-       editCallback();
-    }
+    activeWordBank = wordBank;
+    ShowWordBankModal(editCallback);
 }
 function GetNewWordBankObject() {
     return {
-        title: "Untitled Word Bank",
+        title: DEFAULT_BANK_TITLE,
         words: [],
         ID: GetNewWordBankID(),
         color: GetNextRandomColor()
     }
 }
-function GetColorSelect(updatedCallback) {
+function GetColorSelect(startColor,colorChanged) {
+    var wordWrapper = document.createElement("div");
+    wordWrapper.className = "word";
 
+    var selector = document.createElement("div");
+    selector.className = "color-select";
+    var selected = null;
+    function colorChangedPrefix() {
+        if(selected) {
+            selected.classList.remove("selected");
+        }
+        selected = this;
+        this.classList.add("selected");
+        if(colorChanged) {
+            colorChanged(this.selectionValue);
+        }
+    }
+    for(var i = 0;i<colors.length;i++) {
+        var color = colors[i];
+        var colorSelection = document.createElement("div");
+        colorSelection.className = color;
+        colorSelection.selectionValue = color;
+        if(color === startColor) {
+            selected = colorSelection;
+            colorSelection.classList.add("selected");
+        }
+        colorSelection.addEventListener(
+            "click",colorChangedPrefix.bind(colorSelection),true
+        );
+        selector.appendChild(colorSelection);
+    }
+
+    wordWrapper.appendChild(selector);
+    return wordWrapper;
+}
+function GetWordInputPair(startWord,valueUpdated,wordDeleted) {
+   var word = document.createElement("div");
+   word.className = "word";
+
+   var wordInput = document.createElement("input");
+   wordInput.setAttribute("type","text");
+   wordInput.setAttribute("placeholder","New word..");
+   word.appendChild(wordInput);
+
+   var selectElement = document.createElement("select");
+   for(var i = 0;i<WORD_TYPES.length;i++) {
+        var wordType = WORD_TYPES[i];
+        var option = document.createElement("option");
+        option.appendChild(document.createTextNode(
+            WORD_TYPES_DISPLAY[i]
+        ));
+        option.value = wordType;
+        selectElement.appendChild(option);
+    }
+    word.appendChild(selectElement);
+
+    if(startWord) {
+        var text = startWord.text;
+        text = text.toLowerCase();
+        text = text.charAt(0).toUpperCase() + text.slice(1);
+        wordInput.value = text;
+        selectElement.value = startWord.type;
+    }
+
+    function sendValueUpdated() {
+        //todo input validation
+        if(valueUpdated) {
+            valueUpdated(
+                wordInput.value,
+                selectElement.value
+            );
+        }
+    }
+    function sendWordDeleted() {
+        if(wordDeleted) {
+            wordDeleted(word);
+        }
+    }
+
+    wordInput.addEventListener("input",sendValueUpdated,true);
+    selectElement.addEventListener("change",sendValueUpdated,true);
+
+    var deleteButton = document.createElement("button");
+    deleteButton.appendChild(document.createTextNode(
+        "Delete"
+    ));
+    deleteButton.addEventListener("click",sendWordDeleted,true);
+    word.appendChild(deleteButton);
+
+    return word;
+}
+function GetNewWord() {
+    return {
+        text: "",
+        type: "noun"
+    }
+}
+function TextFilter(text) {
+    text = text.toUpperCase();
+    var buffer = "";
+    for(var i = 0;i<text.length;i++) {
+        var character = text.charAt(i);
+        if(character in ALPHABET_LOOKUP) {
+            buffer += character;
+        }
+    }
+    return buffer;
 }
 function ShowWordBankModal(callback) {
+    var popup = document.createElement("div");
+    popup.className = "popup";
 
-    /*
+    function exit() {
+        var currentWords = activeWordBank.words;
+        for(var i = currentWords.length-1;i>=0;i--) {
+            var word = currentWords[i].text;
+            if(!word) {
+                currentWords.splice(i,1);
+            } else {
+                word = TextFilter(word);
+                if(!word) {
+                    currentWords.splice(i,1);
+                } else {
+                    currentWords[i].text = word;
+                }
+            }
+        }
+        document.body.removeChild(popup);
+        if(callback) {
+            callback();
+        }
+    }
 
-    <div class="popup">
-        <div class="word-bank-modal">
-            <input type="text" class="title" placeholder="Untitled Word Bank"></input>
-            <div class="words">
-                <div class="word">
-                    <div class="color-select">
-                        <div class="green selected"></div>
-                        <div class="purple"></div>
-                        <div class="blue"></div>
-                        <div class="orange"></div>
-                        <div class="red"></div>
-                    </div>
-                </div>
-                <div class="word">
-                    <input type="text" placeholder="New word..."></input>
-                    <select>
-                        <option value="noun">Noun</option>
-                        <option value="adjective">Adjective</option>
-                        <option value="verb">Verb</option>
-                        <option value="other">Other</option>
-                    </select>
-                </div>
-            </div>
-        </div>
-    </div>
+    var oldListener = exitButtonCallback;
+    exitButton.style.zIndex = 3;
+    var oldBorder = exitButton.style.border;
+    exitButton.style.border = "none";
 
-    */
+    exitButtonCallback = function() {
+        exit();
+        exitButtonCallback = oldListener;
+        exitButton.style.border = oldBorder;
+        delete exitButton.style.zIndex;
+    }
+
+    var popupModal = document.createElement("div");
+    popupModal.className = "word-bank-modal";
+
+    var titleInput = document.createElement("input");
+    titleInput.className = "title";
+    titleInput.setAttribute("placeholder",DEFAULT_BANK_TITLE);
+    titleInput.setAttribute("type","text");
+    if(activeWordBank.title && activeWordBank.title !== DEFAULT_BANK_TITLE) {
+        titleInput.value = activeWordBank.title;
+    }
+
+    titleInput.addEventListener("input",function(){
+        activeWordBank.title = titleInput.value;
+    });
+
+    popupModal.appendChild(titleInput);
+
+    var wordBankList = document.createElement("div");
+    wordBankList.classList = "words";
+
+    var colorSelector = GetColorSelect(
+        activeWordBank.color,function(newColor) {
+            activeWordBank.color = newColor
+        }
+    );
+    wordBankList.appendChild(colorSelector);
+
+    function wordUpdated(text,type) {
+        if(text) {
+            this.text = text;
+        }
+        if(this.type) {
+            this.type = type;
+        }
+    }
+    function wordDeleted(wordElement) {
+        this.text = "";
+        wordBankList.removeChild(wordElement);
+    }
+
+    function addNewWord() {
+        var newWord = GetNewWord();
+        wordBankList.insertBefore(GetWordInputPair(
+            newWord,
+            wordUpdated.bind(newWord),
+            wordDeleted.bind(newWord)
+        ),wordBankList.lastChild);
+        activeWordBank.words.push(newWord);
+    }
+
+    function layoutWords() {
+        var total = wordBankList.childElementCount;
+        for(var i = 1;i<total;i++) {
+            wordBankList.removeChild(wordBankList.lastChild);
+        }
+        var currentWords = activeWordBank.words;
+        for(var i = currentWords.length-1;i>=0;i--) {
+            if(!currentWords[i].text) {
+                currentWords.splice(i,1);
+            }
+        }
+        for(var i = 0;i<currentWords.length;i++) {
+            var currentWord = currentWords[i];
+            if(!currentWord.text) {
+                continue;
+            }
+            var wordPairElement = GetWordInputPair(
+                currentWord,
+                wordUpdated.bind(currentWord),
+                wordDeleted.bind(currentWord)
+            );
+            wordBankList.appendChild(wordPairElement);
+        }
+        var createButton = document.createElement("button");
+        createButton.appendChild(document.createTextNode(
+            "New Word"
+        ));
+        createButton.className = "create";
+        createButton.addEventListener("click",addNewWord,true);
+
+        var buttonWordWrapper = document.createElement("div");
+        buttonWordWrapper.className = "word";
+        buttonWordWrapper.appendChild(createButton);
+        wordBankList.appendChild(buttonWordWrapper);
+    }
+    layoutWords();
+
+    popupModal.appendChild(wordBankList);
+    popup.appendChild(popupModal);
+
+    document.body.appendChild(popup);
 }
 function CreateNewWordBank(createCallback) {
-    //todo
-    var didCreate = false;
-    if(didCreate && createCallback) {
-        createCallback();
-    }
+    var newWordBank = GetNewWordBankObject();
+    wordBanks.push(newWordBank);
+    activeWordBank = newWordBank;
+    ShowWordBankModal(function(){
+        if(createCallback) {
+            createCallback(true);
+        }
+    });
 }
 function ShowWordBankPage() {
     ShowPage(wordBanksPage,ReturnToMainMenu);
-    function refresh() {
+    function saveAndRefresh(scrollLast) {
+        SaveWordBanks();
+        refresh(scrollLast);
+    }
+    function refresh(scrollLast) {
         PopulateWordBankList(false,function(){
-            CreateNewWordBank(refresh);
+            CreateNewWordBank(saveAndRefresh);
         },function(editEvent){
             var wordBankID = editEvent.currentTarget.callbackID;
-            EditWordBankByID(wordBankID,refresh);
+            EditWordBankByID(wordBankID,saveAndRefresh);
         },function(deleteEvent){
             var wordBankID = deleteEvent.currentTarget.callbackID;
             CustomPrompt(
@@ -585,10 +815,13 @@ function ShowWordBankPage() {
                 console.log("Yeet")
                 if(callbackID === 1) {
                     DeleteWordBankByID(wordBankID);
-                    refresh();
+                    saveAndRefresh();
                 }
             });
         });
+        if(scrollLast) {
+            document.body.querySelector("div#word-banks div.word-banks").lastChild.scrollIntoView();
+        }
     }
     refresh();
 }

@@ -307,7 +307,7 @@ button.exit-button {
     border-color: inherit;
 }
 button.exit-button:hover {
-    background-color: #d0d0d0;
+    background-color: #b4b4b4;
 }
 button.exit-button:focus {
     outline: none;
@@ -454,8 +454,11 @@ div.word-bank-modal input.title {
     font-size: 14px;
     font-weight: bold;
 }
-div.word-bank-modal input, div.word-bank-modal select {
+div.word-bank-modal input,
+div.word-bank-modal select,
+div.words div.word button {
     outline: none;
+    user-select: none;
 }
 div.words div.word:last-child {
     padding-bottom: 8px;
@@ -495,4 +498,29 @@ div.color-select div.selected::after {
     top: 50%;
     left: 50%;
     transform: translate(-50%,-50%);
+}
+
+div.words div.word button {
+    display: block;
+    height: 100%;
+    box-sizing: border-box;
+    padding: 16px;
+    margin: 4px;
+    border: 0;
+    background-color: #2d2d2d;
+    color: white;
+    transition-duration: 0.2s;
+    transition-property: background-color;
+}
+div.words div.word button:hover {
+    background-color: #da4747;
+}
+div.words div.word button.create {
+    width: 50%;
+    font-weight: bold;
+    margin-left: auto;
+    margin-right: auto;
+}
+div.words div.word button.create:hover {
+    background-color: #787878;
 }
