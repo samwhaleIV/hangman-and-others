@@ -658,7 +658,10 @@ function ShowWordBankModal(callback) {
     var popup = document.createElement("div");
     popup.className = "popup";
 
+    DisableGlobalScroll();
+
     function exit() {
+        EnableGlobalScroll();
         var currentWords = activeWordBank.words;
         for(var i = currentWords.length-1;i>=0;i--) {
             var word = currentWords[i].text;
